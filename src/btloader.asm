@@ -4,7 +4,7 @@
 CODE_OFFSET equ 0x8
 DATA_OFFSET equ 0x10
 KERNEL_LOAD_SEG equ 0x1000
-KERNEL_START_ADDR equ 0x100000
+KERNEL_START_ADDR equ 0x10000
 
 
 start:
@@ -17,16 +17,19 @@ start:
     sti ;enable cpu interrupts back
 
 	;start load kernel
-	mov bx, KERNEL_LOAD_SEG
+	mov ax, 0x1000
+	mov es, ax          
+	xor bx, bx          
+
 	mov dh, 0x00
 	mov dl, 0x80
-	mov cl, 0x02
+	mov cl, 0x02        
 	mov ch, 0x00
-	mov ah, 0x02
-	mov al, 8
+	mov ah, 0x02        
+	mov al, 32          
 	int 0x13
 
-	jc disk_read_error
+	jc disk_read_error  
 
 
 
@@ -46,7 +49,7 @@ disk_read_error:
 
 gdt_start:
     dd 0x0
-    db 0x0
+    dd 0x0
     
 	;code segment desc
     dw 0xFFFF     ; limit
@@ -85,6 +88,7 @@ PModeMain:
 	in al, 0x92
 	or al, 2
 	out 0x92, al
+
 
 	jmp CODE_OFFSET:KERNEL_START_ADDR
 
